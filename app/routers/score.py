@@ -4,7 +4,7 @@ Scoring router — evaluates an LLM output against the vault.
 
 import asyncio
 from pydantic import BaseModel
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_session
@@ -31,7 +31,11 @@ class ScoreRequest(BaseModel):
 
 
 @router.post("/v1/outputs/score")
-async def score_output(payload: ScoreRequest, session: AsyncSession = Depends(get_session)):
+async def score_output(
+    payload: ScoreRequest, 
+    background_tasks: BackgroundTasks,
+    session: AsyncSession = Depends(get_session)
+):
     """Score an incoming LLM output against the vault using cosine similarity and LLM judge."""
     
     # 1. Embed the incoming output text
@@ -115,7 +119,7 @@ async def score_output(payload: ScoreRequest, session: AsyncSession = Depends(ge
                 response_data["explainability"]["reason"] = judge_result.get("reason")
             
     if policy_action in ("block", "human_review"):
-        asyncio.create_task(trigger_webhook(response_data))
+        background_tasks.add_task(trigger_webhook, response_data)
         
     return response_data
 
