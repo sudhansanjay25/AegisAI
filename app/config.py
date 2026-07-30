@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     # App
     APP_NAME: str = "AegisAI"
     DEBUG: bool = False
+    WEBHOOK_URL: str | None = None
     
     # Threshold for Stage 1 Similarity Scorer
     # Any text scoring above this will be sent to the LLM judge (Stage 2)

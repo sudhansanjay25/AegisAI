@@ -7,6 +7,7 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 
 COPY app ./app
+COPY tests ./tests
 
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PORT=8000

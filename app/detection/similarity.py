@@ -20,7 +20,7 @@ async def find_similar_chunks(session, query_embedding: list[float], top_k: int 
             (1 - VaultChunk.embedding.cosine_distance(query_embedding)).label("similarity")
         )
         .join(VaultDocument, VaultChunk.document_id == VaultDocument.id)
-        .order_by(VaultChunk.embedding.cosine_distance(query_embedding))
+        .order_by(VaultChunk.embedding.cosine_distance(query_embedding), VaultChunk.id)
         .limit(top_k)
     )
     return result.all()

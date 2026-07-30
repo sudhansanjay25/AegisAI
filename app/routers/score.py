@@ -14,8 +14,14 @@ from app.detection.judge import judge_factual_overlap
 from app.detection.policy import compute_risk_score, route_policy
 from app.models import ScoredOutput
 from app.config import settings
+from prometheus_client import Counter, Histogram
 
 router = APIRouter(tags=["scoring"])
+
+REQUESTS_SCORED_TOTAL = Counter("requests_scored_total", "Total scoring requests processed")
+POLICY_ACTIONS_TOTAL = Counter("policy_actions_total", "Total policy actions triggered", ["action"])
+JUDGE_LATENCY_SECONDS = Histogram("judge_latency_seconds", "Latency of LLM judge calls")
+JUDGE_ERRORS_TOTAL = Counter("judge_errors_total", "Total errors from the LLM judge")
 
 
 class ScoreRequest(BaseModel):
@@ -41,14 +47,18 @@ async def score_output(payload: ScoreRequest, session: AsyncSession = Depends(ge
     judge_result = {}
     
     # 3. Stage 2: Call the LLM judge if the output clears the similarity threshold
+    import time
     if top_similarity >= settings.SIMILARITY_THRESHOLD and matches:
         matched_texts = [m.text for m in matches]
         
         for attempt in range(2):
             try:
+                start_time = time.time()
                 judge_result = await judge_factual_overlap(payload.output_text, matched_texts)
+                JUDGE_LATENCY_SECONDS.observe(time.time() - start_time)
                 break
             except Exception as e:
+                JUDGE_ERRORS_TOTAL.inc()
                 print(f"Judge call failed (attempt {attempt + 1}): {e}")
                 if attempt == 0:
                     await asyncio.sleep(0.5)
@@ -62,6 +72,8 @@ async def score_output(payload: ScoreRequest, session: AsyncSession = Depends(ge
         judge_result.get("confidence")
     )
     policy_action = route_policy(risk_score)
+    POLICY_ACTIONS_TOTAL.labels(action=policy_action).inc()
+    REQUESTS_SCORED_TOTAL.inc()
 
     # 5. Log the scored output for audit and future processing
     scored = ScoredOutput(
@@ -102,21 +114,53 @@ async def score_output(payload: ScoreRequest, session: AsyncSession = Depends(ge
             if "reason" in judge_result:
                 response_data["explainability"]["reason"] = judge_result.get("reason")
             
+    if policy_action in ("block", "human_review"):
+        asyncio.create_task(trigger_webhook(response_data))
+        
     return response_data
 
+from fastapi import HTTPException
 from sqlalchemy import select
-@router.get("/debug/scored_outputs")
-async def get_scored_outputs(session: AsyncSession = Depends(get_session)):
-    stmt = select(ScoredOutput).where(ScoredOutput.judge_verdict == 'leak').order_by(ScoredOutput.id.desc()).limit(2)
+from datetime import date
+import httpx
+
+@router.get("/v1/outputs/{output_id}")
+async def get_output(output_id: int, session: AsyncSession = Depends(get_session)):
+    stmt = select(ScoredOutput).where(ScoredOutput.id == output_id)
     result = await session.execute(stmt)
-    rows = result.scalars().all()
-    return [
-        {
-            "id": r.id,
-            "output_text": r.output_text[:50] + "...",
-            "judge_verdict": r.judge_verdict,
-            "judge_confidence": r.judge_confidence,
-            "matched_facts": r.matched_facts
-        }
-        for r in rows
-    ]
+    scored = result.scalar_one_or_none()
+    if not scored:
+        raise HTTPException(status_code=404, detail="Scored output not found")
+    return scored
+
+@router.get("/v1/alerts")
+async def get_alerts(
+    agent_id: str | None = None,
+    start_date: date | None = None,
+    end_date: date | None = None,
+    session: AsyncSession = Depends(get_session)
+):
+    stmt = select(ScoredOutput).where(ScoredOutput.policy_action.in_(["block", "human_review"]))
+    if agent_id:
+        stmt = stmt.where(ScoredOutput.agent_id == agent_id)
+    if start_date:
+        stmt = stmt.where(ScoredOutput.created_at >= start_date)
+    if end_date:
+        stmt = stmt.where(ScoredOutput.created_at <= end_date)
+    
+    stmt = stmt.order_by(ScoredOutput.id.desc()).limit(100)
+    result = await session.execute(stmt)
+    return result.scalars().all()
+
+async def trigger_webhook(payload: dict):
+    if not settings.WEBHOOK_URL:
+        return
+    try:
+        async with httpx.AsyncClient() as client:
+            await client.post(
+                settings.WEBHOOK_URL, 
+                json={"text": f"🚨 AegisAI Alert: {payload['policy_action'].upper()} on agent {payload.get('agent_id', 'unknown')}. Risk Score: {payload['risk_score']:.1f}"},
+                timeout=5.0
+            )
+    except Exception as e:
+        print(f"Webhook failed: {e}")
