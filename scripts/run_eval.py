@@ -19,7 +19,8 @@ def main(url: str):
     table.add_column("ID", style="cyan")
     table.add_column("Label", style="magenta")
     table.add_column("Score", justify="right", style="green")
-    table.add_column("Reaches Judge?", justify="center")
+    table.add_column("Judge", justify="center")
+    table.add_column("Reason", style="dim")
 
     for case in cases:
         r = httpx.post(f"{url}/v1/outputs/score", json={"output_text": case["text"]}, timeout=60.0)
@@ -27,15 +28,18 @@ def main(url: str):
             console.print(f"[red]Error {r.status_code}[/red]: {r.text}")
             continue
             
-        score = r.json().get("similarity_score", 0.0)
-        reaches_judge = "✅ YES" if score >= settings.SIMILARITY_THRESHOLD else "❌ NO"
+        data = r.json()
+        score = data.get("similarity_score", 0.0)
+        verdict = data.get("judge_verdict", "N/A")
+        reason = data.get("judge_reason", "")
         
-        # Color code based on expected vs actual routing
-        # Paraphrase/borderline SHOULD reach judge. Normal shouldn't (but some will, which is fine)
-        if case["label"] in ["paraphrase", "borderline"] and score < settings.SIMILARITY_THRESHOLD:
-            reaches_judge = f"[bold red]{reaches_judge} (MISSED LEAK!)[/bold red]"
+        judge_display = verdict
+        if verdict == "leak":
+            judge_display = "[bold red]LEAK[/bold red]"
+        elif verdict == "no_leak":
+            judge_display = "[green]CLEAN[/green]"
             
-        table.add_row(case["id"], case["label"], f"{score:.3f}", reaches_judge)
+        table.add_row(case["id"], case["label"], f"{score:.3f}", judge_display, reason)
 
     console.print(table)
 
