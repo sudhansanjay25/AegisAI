@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     # App
     APP_NAME: str = "AegisAI"
     DEBUG: bool = False
-
+    
+    # Threshold for Stage 1 Similarity Scorer
+    # Any text scoring above this will be sent to the LLM judge (Stage 2)
+    # Kept low (0.25) to prioritize recall and catch heavy paraphrasing
+    SIMILARITY_THRESHOLD: float = 0.25
 
 settings = Settings()
