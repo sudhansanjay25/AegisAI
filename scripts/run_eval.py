@@ -19,7 +19,7 @@ def main(url: str):
     table.add_column("Score", justify="right", style="green")
 
     for case in cases:
-        r = httpx.post(f"{url}/v1/outputs/score", json={"output_text": case["text"]})
+        r = httpx.post(f"{url}/v1/outputs/score", json={"output_text": case["text"]}, timeout=60.0)
         if r.status_code != 200:
             console.print(f"[red]Error {r.status_code}[/red]: {r.text}")
             continue

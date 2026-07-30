@@ -5,8 +5,15 @@ Uses all-MiniLM-L6-v2 (384 dims, fast, good quality for paraphrase detection).
 
 from fastembed import TextEmbedding
 
-# Loads once at process start — ONNX model, ~60MB, runs on CPU efficiently
-_model = TextEmbedding("sentence-transformers/all-MiniLM-L6-v2")
+_model = None
+
+def get_model():
+    global _model
+    if _model is None:
+        from fastembed import TextEmbedding
+        # Loads on first request — ONNX model, ~60MB, runs on CPU efficiently
+        _model = TextEmbedding("sentence-transformers/all-MiniLM-L6-v2")
+    return _model
 
 
 def embed_batch(texts: list[str]) -> list[list[float]]:
@@ -21,6 +28,7 @@ def embed_batch(texts: list[str]) -> list[list[float]]:
     Returns:
         List of embedding vectors (each 384 floats for all-MiniLM-L6-v2).
     """
+    model = get_model()
     # fastembed returns a generator, convert to list of lists
-    embeddings = list(_model.embed(texts))
+    embeddings = list(model.embed(texts))
     return [emb.tolist() for emb in embeddings]
