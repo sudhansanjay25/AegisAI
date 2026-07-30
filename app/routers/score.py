@@ -82,3 +82,20 @@ async def score_output(payload: ScoreRequest, session: AsyncSession = Depends(ge
             response_data["judge_reason"] = judge_result.get("reason")
             
     return response_data
+
+from sqlalchemy import select
+@router.get("/debug/scored_outputs")
+async def get_scored_outputs(session: AsyncSession = Depends(get_session)):
+    stmt = select(ScoredOutput).order_by(ScoredOutput.id.desc()).limit(5)
+    result = await session.execute(stmt)
+    rows = result.scalars().all()
+    return [
+        {
+            "id": r.id,
+            "output_text": r.output_text[:50] + "...",
+            "judge_verdict": r.judge_verdict,
+            "judge_confidence": r.judge_confidence,
+            "matched_facts": r.matched_facts
+        }
+        for r in rows
+    ]
