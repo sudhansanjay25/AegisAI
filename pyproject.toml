@@ -17,6 +17,6 @@ dependencies = [
     "python-docx>=1.2.0",
     "requests>=2.34.2",
     "groq>=1.6.0",
-    "sentence-transformers>=5.6.1",
     "python-multipart>=0.0.32",
+    "fastembed>=0.8.0",
 ]

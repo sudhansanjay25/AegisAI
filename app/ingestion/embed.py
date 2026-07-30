@@ -1,18 +1,18 @@
 """
-Local embedding via sentence-transformers — no API key needed.
+Local embedding via fastembed (ONNX) — no API key needed, low memory footprint.
 Uses all-MiniLM-L6-v2 (384 dims, fast, good quality for paraphrase detection).
 """
 
-from sentence_transformers import SentenceTransformer
+from fastembed import TextEmbedding
 
-# Loads once at process start — ~80MB model, cached by HuggingFace
-_model = SentenceTransformer("all-MiniLM-L6-v2")
+# Loads once at process start — ONNX model, ~60MB, runs on CPU efficiently
+_model = TextEmbedding("sentence-transformers/all-MiniLM-L6-v2")
 
 
 def embed_batch(texts: list[str]) -> list[list[float]]:
-    """Embed a batch of texts locally.
+    """Embed a batch of texts locally using ONNX runtime.
 
-    Same call shape as the old OpenAI version (chunks in → vectors out),
+    Same call shape as before (chunks in → vectors out),
     so nothing in the vault ingestion route needs to change.
 
     Args:
@@ -21,4 +21,6 @@ def embed_batch(texts: list[str]) -> list[list[float]]:
     Returns:
         List of embedding vectors (each 384 floats for all-MiniLM-L6-v2).
     """
-    return _model.encode(texts, normalize_embeddings=True).tolist()
+    # fastembed returns a generator, convert to list of lists
+    embeddings = list(_model.embed(texts))
+    return [emb.tolist() for emb in embeddings]
