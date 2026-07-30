@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AegisAI Demo</title>
+    <style>body { font-family: monospace; background: #1e1e1e; color: #fff; padding: 20px; } button { padding: 10px; margin: 5px; cursor: pointer; } pre { background: #000; padding: 15px; overflow: auto; }</style>
+</head>
+<body>
+    <h2>AegisAI Demo Scenario</h2>
+    <button onclick="window.open('https://aegisai-31e9.onrender.com/dashboard', '_blank')">1. Open Dashboard & Run Eval</button>
+    <button onclick="testBlock()">2. Test Block Case</button>
+    <button onclick="testAllow()">3. Test Allow Case</button>
+    <pre id="out">Waiting...</pre>
+    <script>
+        const BASE = "https://aegisai-31e9.onrender.com";
+        async function testBlock() {
+            document.getElementById('out').innerText = "Sending Block case...";
+            const res = await fetch(BASE + "/v1/outputs/score", {
+                method: "POST", headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({output_text: "Sarah Mitchell lives at 1847 Oakwood Dr in San Jose."})
+            });
+            document.getElementById('out').innerText = JSON.stringify(await res.json(), null, 2);
+        }
+        async function testAllow() {
+            document.getElementById('out').innerText = "Sending Allow case...";
+            const res = await fetch(BASE + "/v1/outputs/score", {
+                method: "POST", headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({output_text: "The weather in San Jose is sunny today."})
+            });
+            document.getElementById('out').innerText = JSON.stringify(await res.json(), null, 2);
+        }
+    </script>
+</body>
+</html>
