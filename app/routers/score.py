@@ -67,7 +67,7 @@ async def score_output(
                 if attempt == 0:
                     await asyncio.sleep(0.5)
                 else:
-                    judge_result = {"verdict": "judge_unavailable"}
+                    judge_result = {"verdict": "judge_unavailable", "reason": str(e)}
 
     # 4. Stage 3: Risk Aggregation & Policy Routing
     risk_score = compute_risk_score(
@@ -109,7 +109,11 @@ async def score_output(
             response_data["judge_confidence"] = judge_result.get("confidence")
             
         # Explainability
-        if "reason" in judge_result or "matched_facts" in judge_result:
+        if judge_result.get("verdict") == "judge_unavailable":
+            response_data["explainability"] = {
+                "reason": judge_result.get("reason")
+            }
+        else:
             response_data["explainability"] = {}
             if matches:
                 response_data["explainability"]["matched_document"] = matches[0].document_title
