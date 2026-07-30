@@ -1,0 +1,31 @@
+MEDICAL RECORDS — STRICTLY CONFIDENTIAL
+HIPAA Protected Information
+
+Patient: David Chen
+DOB: 07/22/1975
+MRN: MRN-2025-44291
+Insurance: Blue Cross PPO — Group #BC-88412
+
+Visit Summary — December 3, 2025
+Chief Complaint: Persistent chest pain, shortness of breath during exertion
+Diagnosis: Hypertensive heart disease (I11.9), Anxiety disorder (F41.1)
+Blood Pressure: 158/94 mmHg (elevated)
+Medications Prescribed:
+  - Lisinopril 20mg daily
+  - Metoprolol 50mg twice daily
+  - Alprazolam 0.5mg as needed for anxiety
+
+Lab Results (Dec 1, 2025):
+  - Total Cholesterol: 247 mg/dL (HIGH)
+  - LDL: 168 mg/dL (HIGH)
+  - HDL: 42 mg/dL (LOW)
+  - Triglycerides: 185 mg/dL (BORDERLINE HIGH)
+  - HbA1c: 6.1% (PRE-DIABETIC)
+
+Follow-up: Scheduled for February 2026. Referred to cardiology for stress test.
+Patient advised on dietary changes and exercise regimen.
+
+Provider Notes (Internal):
+Patient expressed concern about employer learning of diagnosis. Discussed HIPAA
+protections. Patient works in high-stress finance role — occupational health
+referral may be appropriate.

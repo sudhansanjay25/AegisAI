@@ -17,9 +17,8 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://aegis:aegis@db:5432/aegisai"
 
-    # LLM API keys (optional at startup, required when detection routes are added)
-    OPENAI_API_KEY: str = ""
-    ANTHROPIC_API_KEY: str = ""
+    # LLM API key (Groq)
+    GROQ_API_KEY: str = ""
 
     # App
     APP_NAME: str = "AegisAI"

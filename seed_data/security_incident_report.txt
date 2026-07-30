@@ -1,0 +1,32 @@
+SECURITY INCIDENT REPORT — CLASSIFIED INTERNAL
+Incident ID: INC-2025-0093
+Severity: HIGH
+Date Detected: November 18, 2025
+Date Reported: November 19, 2025
+
+Summary:
+Unauthorized access detected to internal code repository (GitLab). Attacker used
+compromised credentials of developer account "jpark@aegisai.com" to clone three
+private repositories including the core detection engine source code.
+
+Timeline:
+- 11/18 02:14 UTC: Anomalous git clone from IP 185.220.101.42 (Tor exit node)
+- 11/18 02:16 UTC: Three repos cloned: aegis-core, aegis-ml-models, aegis-api
+- 11/18 02:31 UTC: SOC alert triggered by volume-based anomaly detection
+- 11/18 03:00 UTC: Account suspended, all tokens rotated
+- 11/18 08:00 UTC: Forensic investigation initiated
+
+Root Cause:
+Developer reused personal password across services. Password was exposed in a
+third-party breach (DataDump-2025-Nov, published on dark web forum).
+
+Impact Assessment:
+- Source code for detection engine potentially compromised
+- No customer data accessed (verified via audit logs)
+- ML model weights were in the cloned repos (competitive risk)
+
+Remediation:
+1. Mandatory password reset for all employees (completed 11/19)
+2. MFA enforcement on all internal services (completed 11/20)
+3. Repository access audit — principle of least privilege review (in progress)
+4. External penetration test scheduled for December 2025

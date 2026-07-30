@@ -1,0 +1,33 @@
+CUSTOMER DATABASE EXTRACT — CONFIDENTIAL
+Classification: PII / Business Sensitive
+
+Customer ID: CUST-10042
+Company: Meridian Healthcare Systems
+Contact: Dr. Patricia Alvarez, CISO
+Email: p.alvarez@meridianhcs.com
+Phone: (312) 555-8901
+Contract Value: $485,000/year (3-year term, expires Aug 2027)
+Products: AegisAI Enterprise, Threat Intelligence Feed, Managed SOC
+Payment Terms: Net-30, ACH transfer
+Bank: JPMorgan Chase, Account ending ****3847
+
+Customer ID: CUST-10089
+Company: First National Bank of Wyoming
+Contact: Robert Kim, VP of IT Security
+Email: rkim@fnbwy.com
+Phone: (307) 555-4420
+Contract Value: $290,000/year (2-year term, expires Dec 2026)
+Products: AegisAI Pro, Compliance Reporting Module
+Payment Terms: Net-45, Wire transfer
+Bank: Wells Fargo, Account ending ****9162
+Special Notes: Regulatory audit pending — may need SOC2 Type II report by Q1 2026.
+
+Customer ID: CUST-10156
+Company: TechVentures Capital LLC
+Contact: Amanda Foster, Managing Partner
+Email: afoster@techventures.vc
+Phone: (415) 555-7733
+Contract Value: $125,000/year (1-year term, auto-renew March 2026)
+Products: AegisAI Startup Tier
+Payment Terms: Annual prepaid
+Notes: Also a Series B investor — handle with extra care. NDA covers mutual terms.

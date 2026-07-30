@@ -1,0 +1,30 @@
+BOARD STRATEGY MEMO — CONFIDENTIAL
+For Internal Distribution Only
+
+TO: Board of Directors
+FROM: CEO Office
+DATE: January 10, 2026
+RE: Q1 2026 Strategic Priorities and M&A Pipeline
+
+1. ACQUISITION TARGET: NovaSec Inc.
+   Estimated valuation: $45M–$52M
+   Status: LOI signed, due diligence underway
+   Expected close: March 2026
+   Rationale: Their endpoint detection IP fills our gap in the SMB market.
+   Risk: Their CTO has a non-compete from previous employer expiring June 2026.
+
+2. PRODUCT PIVOT
+   Board approved sunset of legacy "ShieldWall" product line by Q3 2026.
+   Migration path for existing 2,400 enterprise customers to AegisAI platform.
+   Expected churn: 8-12% during transition.
+
+3. FINANCIAL OUTLOOK
+   Projected ARR: $28M by EOY 2026 (up from $19M in 2025)
+   Burn rate: $1.8M/month (runway: 14 months at current rate)
+   Series C fundraise planned for Q2 2026 — targeting $60M at $300M pre-money.
+   Lead investor: Sequoia (term sheet expected by Feb 15).
+
+4. PERSONNEL — CONFIDENTIAL
+   VP of Sales (Mark Thompson) tendering resignation effective Feb 28.
+   Successor candidates: Internal — Lisa Park; External — recruiting via Heidrick.
+   CFO compensation adjustment: $45K base increase + 0.5% equity refresh.

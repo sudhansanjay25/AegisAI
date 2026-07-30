@@ -1,0 +1,23 @@
+EMPLOYEE RECORD — CONFIDENTIAL
+
+Name: Sarah Mitchell
+Employee ID: EMP-2024-0847
+Department: Engineering
+Position: Senior Software Engineer
+SSN: 482-39-1057
+Date of Birth: March 15, 1989
+Salary: $142,500
+Home Address: 1847 Oakwood Drive, San Jose, CA 95126
+Emergency Contact: James Mitchell (Spouse) — (408) 555-2391
+Bank Account: Chase Checking ****7234
+Direct Deposit Routing: 021000021
+
+Performance Review Summary (Q4 2025):
+Sarah consistently exceeds expectations in code quality and team mentorship.
+Promoted to tech lead effective January 2026. Approved for RSU grant of 500 shares.
+Manager notes: "Exceptional contributor. Flight risk if not promoted — competing
+offer from Stripe at $165k base."
+
+Medical Leave History:
+- Aug 2024: 3 days (surgery recovery, FMLA approved)
+- Feb 2025: 5 days (stress leave, HR counseling recommended)
