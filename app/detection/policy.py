@@ -2,7 +2,7 @@ def compute_risk_score(similarity_score: float, judge_verdict: str | None, judge
     if judge_verdict == "leak":
         return min(100.0, 50.0 + float(judge_confidence or 0.0) * 50.0)
     if judge_verdict == "judge_unavailable":
-        return similarity_score * 60.0
+        return min(100.0, similarity_score * 160.0)
     return similarity_score * 40.0
 
 def route_policy(risk_score: float) -> str:
