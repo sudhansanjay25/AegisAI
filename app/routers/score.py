@@ -11,6 +11,7 @@ from app.db import get_session
 from app.ingestion.embed import embed_batch
 from app.detection.similarity import find_similar_chunks
 from app.detection.judge import judge_factual_overlap
+from app.detection.policy import compute_risk_score, route_policy
 from app.models import ScoredOutput
 from app.config import settings
 
@@ -54,7 +55,15 @@ async def score_output(payload: ScoreRequest, session: AsyncSession = Depends(ge
                 else:
                     judge_result = {"verdict": "judge_unavailable"}
 
-    # 4. Log the scored output for audit and future processing
+    # 4. Stage 3: Risk Aggregation & Policy Routing
+    risk_score = compute_risk_score(
+        top_similarity, 
+        judge_result.get("verdict"), 
+        judge_result.get("confidence")
+    )
+    policy_action = route_policy(risk_score)
+
+    # 5. Log the scored output for audit and future processing
     scored = ScoredOutput(
         agent_id=payload.agent_id,
         session_id=payload.session_id,
@@ -64,6 +73,8 @@ async def score_output(payload: ScoreRequest, session: AsyncSession = Depends(ge
         judge_verdict=judge_result.get("verdict"),
         judge_confidence=judge_result.get("confidence"),
         matched_facts=judge_result.get("matched_facts"),
+        risk_score=risk_score,
+        policy_action=policy_action,
     )
     session.add(scored)
     await session.commit()
@@ -71,15 +82,25 @@ async def score_output(payload: ScoreRequest, session: AsyncSession = Depends(ge
     response_data = {
         "scored_output_id": scored.id,
         "similarity_score": top_similarity,
-        "matched_chunks": [{"id": m.id, "text": m.text[:200], "similarity": m.similarity} for m in matches],
+        "risk_score": risk_score,
+        "policy_action": policy_action,
+        "matched_chunks": [{"id": m.id, "document": m.document_title, "text": m.text[:200], "similarity": m.similarity} for m in matches],
     }
     
     if judge_result:
         response_data["judge_verdict"] = judge_result.get("verdict")
         if "confidence" in judge_result:
             response_data["judge_confidence"] = judge_result.get("confidence")
-        if "reason" in judge_result:
-            response_data["judge_reason"] = judge_result.get("reason")
+            
+        # Explainability
+        if "reason" in judge_result or "matched_facts" in judge_result:
+            response_data["explainability"] = {}
+            if matches:
+                response_data["explainability"]["matched_document"] = matches[0].document_title
+            if "matched_facts" in judge_result:
+                response_data["explainability"]["matched_facts"] = judge_result.get("matched_facts")
+            if "reason" in judge_result:
+                response_data["explainability"]["reason"] = judge_result.get("reason")
             
     return response_data
 
