@@ -86,7 +86,7 @@ async def score_output(payload: ScoreRequest, session: AsyncSession = Depends(ge
 from sqlalchemy import select
 @router.get("/debug/scored_outputs")
 async def get_scored_outputs(session: AsyncSession = Depends(get_session)):
-    stmt = select(ScoredOutput).order_by(ScoredOutput.id.desc()).limit(5)
+    stmt = select(ScoredOutput).where(ScoredOutput.judge_verdict == 'leak').order_by(ScoredOutput.id.desc()).limit(2)
     result = await session.execute(stmt)
     rows = result.scalars().all()
     return [

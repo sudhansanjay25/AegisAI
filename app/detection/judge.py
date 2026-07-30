@@ -32,8 +32,9 @@ General knowledge that happens to overlap does NOT count."""
 
 def _get_client() -> AsyncGroq:
     """Create a Groq client (lazy, no persistent state needed)."""
-    # TEMPORARY BREAK FOR ERROR HANDLING TEST
-    return AsyncGroq(api_key="gsk_badkey12345")
+    if not settings.GROQ_API_KEY:
+        raise RuntimeError("GROQ_API_KEY is not set — cannot run judge")
+    return AsyncGroq(api_key=settings.GROQ_API_KEY)
 
 
 async def judge_factual_overlap(output_text: str, matched_chunks: list[str]) -> dict:
