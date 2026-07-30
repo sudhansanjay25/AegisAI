@@ -109,7 +109,7 @@ async function runEval() {
   out.style.display = "block";
   out.textContent = "Calling /v1/eval/run ...";
   try {
-    const res = await fetch("/v1/eval/run");
+    const res = await fetch("/v1/eval/run", { method: "POST" });
     const data = await res.json();
     out.textContent = JSON.stringify(data, null, 2);
   } catch (err) {
