@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AegisAI Dashboard</title>
+<style>
+  body {
+    font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+    background: #0f1115;
+    color: #e6e6e6;
+    margin: 0;
+    padding: 32px;
+  }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  .subtitle { color: #999; font-size: 13px; margin-bottom: 28px; }
+
+  section { margin-bottom: 36px; }
+  h2 { font-size: 15px; color: #ccc; border-bottom: 1px solid #2a2d34; padding-bottom: 8px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #1f2127; }
+  th { color: #888; font-weight: 500; text-transform: uppercase; font-size: 11px; }
+
+  .badge {
+    display: inline-block; padding: 2px 10px; border-radius: 10px;
+    font-size: 11px; font-weight: 600; color: #0f1115;
+  }
+
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font-size: 12px; }
+  .bar-label { width: 60px; color: #999; }
+  .bar-track { flex: 1; background: #1a1c22; border-radius: 3px; overflow: hidden; height: 16px; }
+  .bar-fill { background: #4a90d9; height: 100%; }
+  .bar-count { width: 24px; text-align: right; color: #ccc; }
+
+  #run-eval-btn {
+    background: #2a6df4; color: white; border: none; padding: 8px 16px;
+    border-radius: 6px; cursor: pointer; font-size: 13px;
+  }
+  #run-eval-btn:disabled { opacity: 0.6; cursor: default; }
+  #eval-result {
+    margin-top: 16px; background: #14161b; border: 1px solid #2a2d34;
+    border-radius: 6px; padding: 14px; font-size: 12px; white-space: pre-wrap;
+    font-family: ui-monospace, monospace; max-height: 400px; overflow: auto;
+  }
+</style>
+</head>
+<body>
+
+<h1>AegisAI — Detection Dashboard</h1>
+<div class="subtitle">Last 20 scored outputs, most recent first</div>
+
+<section>
+  <h2>Recent Scored Outputs</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Judge Verdict</th>
+        <th>Risk Score</th>
+        <th>Policy Action</th>
+        <th>Matched Document</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td>{{ row.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+        <td>{{ row.judge_verdict }}</td>
+        <td>{{ "%.1f"|format(row.risk_score) }}</td>
+        <td>
+          <span class="badge" style="background: {{ policy_colors.get(row.policy_action, '#555') }}">
+            {{ row.policy_action }}
+          </span>
+        </td>
+        <td>{{ row.matched_document or "—" }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" style="color:#666;">No scored outputs yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Score Distribution</h2>
+  {% for b in bucket_counts %}
+  <div class="bar-row">
+    <div class="bar-label">{{ b.label }}</div>
+    <div class="bar-track">
+      <div class="bar-fill" style="width: {{ (b.count / max_count * 100)|round(0) }}%"></div>
+    </div>
+    <div class="bar-count">{{ b.count }}</div>
+  </div>
+  {% endfor %}
+</section>
+
+<section>
+  <h2>Run Live Eval</h2>
+  <button id="run-eval-btn" onclick="runEval()">Run Eval</button>
+  <div id="eval-result" style="display:none;"></div>
+</section>
+
+<script>
+async function runEval() {
+  const btn = document.getElementById("run-eval-btn");
+  const out = document.getElementById("eval-result");
+  btn.disabled = true;
+  btn.textContent = "Running...";
+  out.style.display = "block";
+  out.textContent = "Calling /v1/eval/run ...";
+  try {
+    const res = await fetch("/v1/eval/run");
+    const data = await res.json();
+    out.textContent = JSON.stringify(data, null, 2);
+  } catch (err) {
+    out.textContent = "Error calling /v1/eval/run: " + err;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Run Eval";
+  }
+}
+</script>
+
+</body>
+</html>

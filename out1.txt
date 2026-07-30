@@ -1,0 +1,25 @@
+     Similarity Evaluation (http://localhost:8000) | Threshold: 0.25      
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━┓
+┃ ID           ┃ Label      ┃ Score ┃       Judge       ┃  Risk ┃ Policy ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━┩
+│ normal-1     │ normal     │ 0.128 │        N/A        │   5.1 │ ALLOW  │
+│ normal-2     │ normal     │ 0.077 │        N/A        │   3.1 │ ALLOW  │
+│ normal-3     │ normal     │ 0.071 │        N/A        │   2.9 │ ALLOW  │
+│ normal-4     │ normal     │ 0.258 │ judge_unavailable │  41.2 │ REDACT │
+│ normal-5     │ normal     │ 0.308 │ judge_unavailable │  49.3 │ REDACT │
+│ normal-6     │ normal     │ 0.026 │        N/A        │   1.0 │ ALLOW  │
+│ normal-7     │ normal     │ 0.202 │        N/A        │   8.1 │ ALLOW  │
+│ normal-8     │ normal     │ 0.149 │        N/A        │   6.0 │ ALLOW  │
+│ normal-9     │ normal     │ 0.103 │        N/A        │   4.1 │ ALLOW  │
+│ normal-10    │ normal     │ 0.392 │ judge_unavailable │  62.8 │ REVIEW │
+│ paraphrase-1 │ paraphrase │ 0.583 │ judge_unavailable │  93.3 │ BLOCK  │
+│ paraphrase-2 │ paraphrase │ 0.561 │ judge_unavailable │  89.7 │ BLOCK  │
+│ paraphrase-3 │ paraphrase │ 0.570 │ judge_unavailable │  91.2 │ BLOCK  │
+│ paraphrase-4 │ paraphrase │ 0.361 │ judge_unavailable │  57.7 │ REDACT │
+│ paraphrase-5 │ paraphrase │ 0.724 │ judge_unavailable │ 100.0 │ BLOCK  │
+│ borderline-1 │ borderline │ 0.393 │ judge_unavailable │  62.8 │ REVIEW │
+│ borderline-2 │ borderline │ 0.495 │ judge_unavailable │  79.2 │ REVIEW │
+│ borderline-3 │ borderline │ 0.567 │ judge_unavailable │  90.7 │ BLOCK  │
+│ borderline-4 │ borderline │ 0.564 │ judge_unavailable │  90.2 │ BLOCK  │
+│ borderline-5 │ borderline │ 0.353 │ judge_unavailable │  56.4 │ REDACT │
+└──────────────┴────────────┴───────┴───────────────────┴───────┴────────┘

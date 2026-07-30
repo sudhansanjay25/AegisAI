@@ -30,3 +30,8 @@ pgdata/
 
 # uv
 # uv.lock is committed for reproducibility — do NOT gitignore it
+
+
+
+
+Uploadables/
