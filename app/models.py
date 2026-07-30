@@ -2,7 +2,8 @@
 AegisAI ORM models — vault documents and chunks with pgvector embeddings.
 """
 
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, func
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Float, func
+from sqlalchemy.dialects.postgresql import JSONB, ARRAY
 from sqlalchemy.orm import relationship
 from pgvector.sqlalchemy import Vector
 
@@ -35,3 +36,27 @@ class VaultChunk(Base):
     embedding = Column(Vector(384))  # matches all-MiniLM-L6-v2 dimensions
 
     document = relationship("VaultDocument", back_populates="chunks")
+
+
+class ScoredOutput(Base):
+    """Audit log of outputs evaluated by the system."""
+
+    __tablename__ = "scored_outputs"
+
+    id = Column(Integer, primary_key=True)
+    agent_id = Column(String, nullable=True)
+    session_id = Column(String, nullable=True)
+    output_text = Column(Text, nullable=False)
+    similarity_score = Column(Float, nullable=False)
+    matched_chunk_ids = Column(ARRAY(Integer), default=[])
+    
+    # Populated at Hour 9-13 (Judge Stage)
+    judge_verdict = Column(String, nullable=True)
+    judge_confidence = Column(Float, nullable=True)
+    matched_facts = Column(JSONB, nullable=True)
+    
+    # Populated at Hour 13-15 (Aggregation/Policy Stage)
+    risk_score = Column(Float, nullable=True)
+    policy_action = Column(String, nullable=True)
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

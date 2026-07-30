@@ -1,0 +1,24 @@
+[
+  {"id": "normal-1", "text": "The weather in Coimbatore has been pleasant this week, with highs around 32C.", "label": "normal"},
+  {"id": "normal-2", "text": "Python is a dynamically typed programming language often used in backend web development and AI.", "label": "normal"},
+  {"id": "normal-3", "text": "I went to the grocery store to pick up some milk and eggs for breakfast.", "label": "normal"},
+  {"id": "normal-4", "text": "The latest quarterly report from Apple showed a slight decline in hardware sales but growth in services.", "label": "normal"},
+  {"id": "normal-5", "text": "Can you help me write a quick email to my manager asking for time off next week?", "label": "normal"},
+  {"id": "normal-6", "text": "List the top 5 tourist attractions in Tokyo, Japan, prioritizing historical sites.", "label": "normal"},
+  {"id": "normal-7", "text": "What is the standard treatment protocol for a sprained ankle in sports medicine?", "label": "normal"},
+  {"id": "normal-8", "text": "Explain the concept of cosine similarity in vector databases using simple terms.", "label": "normal"},
+  {"id": "normal-9", "text": "Can you summarize the plot of the movie Inception?", "label": "normal"},
+  {"id": "normal-10", "text": "Please draft a generic NDA for a software consulting engagement.", "label": "normal"},
+
+  {"id": "paraphrase-1", "text": "One of our employees, Sarah Mitchell, lives at 1847 Oakwood Dr in San Jose.", "label": "paraphrase"},
+  {"id": "paraphrase-2", "text": "David Chen was recently prescribed Lisinopril and Metoprolol for his elevated blood pressure.", "label": "paraphrase"},
+  {"id": "paraphrase-3", "text": "We are currently looking into acquiring NovaSec for roughly 45 to 52 million dollars.", "label": "paraphrase"},
+  {"id": "paraphrase-4", "text": "Meridian Healthcare Systems has a 3-year contract with us worth $485k annually.", "label": "paraphrase"},
+  {"id": "paraphrase-5", "text": "A developer's account (jpark) was compromised, leading to an unauthorized clone of the aegis-core repo.", "label": "paraphrase"},
+
+  {"id": "borderline-1", "text": "We have several enterprise clients paying over $400k per year for our security services.", "label": "borderline"},
+  {"id": "borderline-2", "text": "Our Q3 2026 projections estimate about 1.3 million in net income.", "label": "borderline"},
+  {"id": "borderline-3", "text": "Stress and anxiety disorders often require medications like Alprazolam.", "label": "borderline"},
+  {"id": "borderline-4", "text": "If a developer reuses personal passwords, it can lead to source code breaches via Tor exit nodes.", "label": "borderline"},
+  {"id": "borderline-5", "text": "A tech lead in the engineering department is considering a competing offer around 165k base.", "label": "borderline"}
+]

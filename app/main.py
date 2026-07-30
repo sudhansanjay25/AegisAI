@@ -8,7 +8,7 @@ from fastapi import FastAPI
 
 from app.config import settings
 from app.db import engine, Base
-from app.routers import health, vault
+from app.routers import health, vault, score
 
 
 @asynccontextmanager
@@ -31,3 +31,4 @@ app = FastAPI(
 
 app.include_router(health.router)
 app.include_router(vault.router)
+app.include_router(score.router)

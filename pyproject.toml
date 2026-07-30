@@ -19,4 +19,6 @@ dependencies = [
     "groq>=1.6.0",
     "python-multipart>=0.0.32",
     "fastembed>=0.8.0",
+    "httpx>=0.28.1",
+    "rich>=15.0.0",
 ]
