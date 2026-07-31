@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql+asyncpg://aegis:aegis@db:5432/aegisai"
 
     # LLM API key (Groq)
-    GROQ_API_KEY: str = ""
+    GROQ_API_KEY: str = "broken_key_for_testing"
 
     # Client API Key (for caller authentication)
     API_KEY: str = "aegis-dev-key"

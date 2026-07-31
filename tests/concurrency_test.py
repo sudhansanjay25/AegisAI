@@ -2,17 +2,19 @@ import asyncio
 import httpx
 import time
 
-URL = "https://aegisai-31e9.onrender.com/v1/outputs/score"
+URL = "http://localhost:8000/v1/outputs/score"
+API_KEY = "aegis-dev-key"
 PAYLOAD = {
-    "output_text": "One of our employees, Sarah Mitchell, lives at 1847 Oakwood Dr in San Jose.",
+    "output_text": "The Q3 earnings report showed a 15% increase in revenue.",
     "agent_id": "concurrency_tester",
     "session_id": "test_123"
 }
 
 async def send_req(client, i):
     start = time.time()
+    headers = {"X-API-Key": API_KEY}
     try:
-        r = await client.post(URL, json=PAYLOAD, timeout=60.0)
+        r = await client.post(URL, json=PAYLOAD, headers=headers, timeout=60.0)
         return r.status_code, time.time() - start
     except Exception as e:
         return f"Error: {str(e.__class__.__name__)} - {str(e)}", time.time() - start
