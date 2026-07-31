@@ -62,6 +62,7 @@ async def dashboard(request: Request, session: AsyncSession = Depends(get_sessio
         bucket_counts.append({"label": f"{lo}-{hi-1}", "count": count})
     max_count = max((b["count"] for b in bucket_counts), default=0) or 1
 
+    from app.config import settings
     return templates.TemplateResponse(
         request=request,
         name="dashboard.html",
@@ -71,6 +72,7 @@ async def dashboard(request: Request, session: AsyncSession = Depends(get_sessio
             "policy_colors": POLICY_COLORS,
             "bucket_counts": bucket_counts,
             "max_count": max_count,
+            "api_key": settings.API_KEY,
         },
     )
 

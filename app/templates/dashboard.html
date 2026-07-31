@@ -320,7 +320,13 @@ async function runEval() {
   out.textContent = "Calling POST /v1/eval/run...\nThis will embed and evaluate 10 cases against the vault.";
   
   try {
-    const res = await fetch("/v1/eval/run", { method: "POST" });
+    const res = await fetch("/v1/eval/run", { 
+      method: "POST",
+      headers: {
+        "X-API-Key": "{{ api_key }}",
+        "Content-Type": "application/json"
+      }
+    });
     const data = await res.json();
     out.innerHTML = `<span style="color: #fff">Execution Complete</span>\n\n` + JSON.stringify(data, null, 2);
   } catch (err) {
