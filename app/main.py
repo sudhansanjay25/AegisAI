@@ -19,6 +19,11 @@ async def lifespan(app: FastAPI):
         # Import models so Base.metadata knows about them
         import app.models  # noqa: F401
         await conn.run_sync(Base.metadata.create_all)
+        
+    print("Preloading embedding model...")
+    from app.ingestion.embed import get_model
+    get_model()
+    print("Embedding model loaded.")
     yield
 
 app = FastAPI(

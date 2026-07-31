@@ -3,7 +3,10 @@ Enterprise AI Governance Platform
 
 AegisAI is a real-time policy engine that intercepts, scores, and blocks data leaks from AI agents before they leave your network. By vectorizing outputs against a vault of confidential enterprise data, AegisAI uses an LLM judge to determine factual overlap and routes actions (allow, redact, human_review, block) dynamically.
 
-### Live Environment
+### Architecture
+1. **Stage 1 (Vector Search):** We use a local `sentence-transformers` ONNX model (`all-MiniLM-L6-v2`) via `fastembed` to compute embeddings locally on the CPU (approx. 65ms latency). This compares incoming outputs to the secure vault (Postgres + pgvector).
+2. **Stage 2 (LLM Judge):** If similarity > 0.25, the text and vault chunks are sent to Groq (`llama-3.3-70b-versatile`). Groq returns a strict JSON verdict (approx. 1.0s latency).
+3. **Stage 3 (Policy Engine):** Aggregates a risk score and routes to `allow`, `human_review`, or `block` dynamically.
 - **API URL:** `https://aegisai-31e9.onrender.com`
 - **Dashboard:** [https://aegisai-31e9.onrender.com/dashboard](https://aegisai-31e9.onrender.com/dashboard)
 - **Repo:** [https://github.com/sudhansanjay25/AegisAI](https://github.com/sudhansanjay25/AegisAI)
