@@ -31,18 +31,19 @@ class ScoreRequest(BaseModel):
     session_id: str | None = None
 
 
-@router.post("/v1/outputs/score", dependencies=[Depends(verify_api_key)])
-async def score_output(
-    payload: ScoreRequest, 
-    background_tasks: BackgroundTasks,
-    session: AsyncSession = Depends(get_session)
-):
-    """Score an incoming LLM output against the vault using cosine similarity and LLM judge."""
+async def score_output_internal(
+    output_text: str, 
+    session: AsyncSession,
+    agent_id: str | None = None,
+    session_id: str | None = None,
+    background_tasks: BackgroundTasks | None = None
+) -> dict:
+    """Core scoring logic extracted for reuse."""
     
     # 1. Embed the incoming output text
     import time
     t0 = time.time()
-    [embedding] = embed_batch([payload.output_text])
+    [embedding] = embed_batch([output_text])
     
     # 2. Find the closest matching chunks in the vault
     matches = await find_similar_chunks(session, embedding, top_k=5)
@@ -63,7 +64,7 @@ async def score_output(
         for attempt in range(2):
             try:
                 start_time = time.time()
-                judge_result = await judge_factual_overlap(payload.output_text, matched_texts)
+                judge_result = await judge_factual_overlap(output_text, matched_texts)
                 JUDGE_LATENCY_SECONDS.observe(time.time() - start_time)
                 break
             except Exception as e:
@@ -90,9 +91,9 @@ async def score_output(
 
     # 5. Log the scored output for audit and future processing
     scored = ScoredOutput(
-        agent_id=payload.agent_id,
-        session_id=payload.session_id,
-        output_text=payload.output_text,
+        agent_id=agent_id,
+        session_id=session_id,
+        output_text=output_text,
         similarity_score=top_similarity,
         matched_chunk_ids=matched_ids,
         judge_verdict=judge_result.get("verdict"),
@@ -134,10 +135,25 @@ async def score_output(
             if "reason" in judge_result:
                 response_data["explainability"]["reason"] = judge_result.get("reason")
             
-    if policy_action in ("block", "human_review"):
+    if policy_action in ("block", "human_review") and background_tasks:
         background_tasks.add_task(trigger_webhook, response_data)
         
     return response_data
+
+@router.post("/v1/outputs/score", dependencies=[Depends(verify_api_key)])
+async def score_output(
+    payload: ScoreRequest, 
+    background_tasks: BackgroundTasks,
+    session: AsyncSession = Depends(get_session)
+):
+    """Score an incoming LLM output against the vault using cosine similarity and LLM judge."""
+    return await score_output_internal(
+        payload.output_text, 
+        session,
+        agent_id=payload.agent_id,
+        session_id=payload.session_id,
+        background_tasks=background_tasks
+    )
 
 from fastapi import HTTPException
 from sqlalchemy import select
