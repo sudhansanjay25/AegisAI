@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from app.config import settings
 from app.db import engine, Base
 from prometheus_fastapi_instrumentator import Instrumentator
-from app.routers import health, vault, score, eval, dashboard
+from app.routers import health, vault, score, eval, dashboard, middleware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -40,3 +40,4 @@ app.include_router(vault.router)
 app.include_router(score.router)
 app.include_router(eval.router)
 app.include_router(dashboard.router)
+app.include_router(middleware.router)
