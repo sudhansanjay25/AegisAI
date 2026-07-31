@@ -40,6 +40,8 @@ async def score_output(
     """Score an incoming LLM output against the vault using cosine similarity and LLM judge."""
     
     # 1. Embed the incoming output text
+    import time
+    t0 = time.time()
     [embedding] = embed_batch([payload.output_text])
     
     # 2. Find the closest matching chunks in the vault
@@ -51,8 +53,10 @@ async def score_output(
 
     judge_result = {}
     
+    t1 = time.time()
+    print(f"[LATENCY] Stage 1 (Embedding + DB Search) took: {t1 - t0:.3f}s")
+    
     # 3. Stage 2: Call the LLM judge if the output clears the similarity threshold
-    import time
     if top_similarity >= settings.SIMILARITY_THRESHOLD and matches:
         matched_texts = [m.text for m in matches]
         
@@ -69,6 +73,9 @@ async def score_output(
                     await asyncio.sleep(0.5)
                 else:
                     judge_result = {"verdict": "judge_unavailable", "reason": str(e)}
+
+    t2 = time.time()
+    print(f"[LATENCY] Stage 2 (Groq LLM Call) took: {t2 - t1:.3f}s")
 
     # 4. Stage 3: Risk Aggregation & Policy Routing
     risk_score = compute_risk_score(
@@ -91,6 +98,7 @@ async def score_output(
         judge_verdict=judge_result.get("verdict"),
         judge_confidence=judge_result.get("confidence"),
         matched_facts=judge_result.get("matched_facts"),
+        judge_model_used=judge_result.get("judge_model_used"),
         risk_score=risk_score,
         policy_action=policy_action,
     )
@@ -117,6 +125,8 @@ async def score_output(
             }
         else:
             response_data["explainability"] = {}
+            if "judge_model_used" in judge_result:
+                response_data["explainability"]["judge_model_used"] = judge_result.get("judge_model_used")
             if matches:
                 response_data["explainability"]["matched_document"] = matches[0].document_title
             if "matched_facts" in judge_result:

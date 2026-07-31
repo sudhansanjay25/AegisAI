@@ -60,20 +60,27 @@ async def judge_factual_overlap(output_text: str, matched_chunks: list[str]) -> 
         {"role": "user", "content": f"OUTPUT:\n{output_text}\n\nVAULT_CHUNKS:\n{chunks_text}"},
     ]
 
-    try:
-        response = await client.chat.completions.create(
-            model=JUDGE_MODEL,
-            messages=messages,
-            response_format={"type": "json_object"},
-            temperature=0,
-        )
-    except Exception as primary_err:
-        print(f"[JUDGE FALLBACK] Primary model ({JUDGE_MODEL}) failed: {primary_err}. Trying fallback...")
-        response = await client.chat.completions.create(
-            model=FALLBACK_MODEL,
-            messages=messages,
-            response_format={"type": "json_object"},
-            temperature=0,
-        )
+    import groq
+    import logging
 
-    return json.loads(response.choices[0].message.content)
+    for model in (JUDGE_MODEL, FALLBACK_MODEL):
+        try:
+            response = await client.chat.completions.create(
+                model=model,
+                messages=messages,
+                response_format={"type": "json_object"},
+                temperature=0,
+            )
+            result = json.loads(response.choices[0].message.content)
+            result["judge_model_used"] = model
+            return result
+        except (groq.RateLimitError, groq.InternalServerError, groq.APIConnectionError) as e:
+            logging.warning(f"[JUDGE FALLBACK] {model} failed, trying next tier: {e}")
+            continue
+        except Exception as e:
+            # Non-rate-limit errors (e.g. prompt too long, bad JSON): don't blindly retry
+            logging.error(f"[JUDGE ERROR] {model} failed with non-retryable error: {e}")
+            raise
+    
+    # Both models exhausted (or single model exhausted if only one is configured)
+    raise RuntimeError("Both primary and fallback models exhausted due to rate limits")

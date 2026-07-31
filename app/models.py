@@ -54,6 +54,7 @@ class ScoredOutput(Base):
     judge_verdict = Column(String, nullable=True)
     judge_confidence = Column(Float, nullable=True)
     matched_facts = Column(JSONB, nullable=True)
+    judge_model_used = Column(String, nullable=True)
     
     # Populated at Hour 13-15 (Aggregation/Policy Stage)
     risk_score = Column(Float, nullable=True)
