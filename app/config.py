@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     # LLM API key (Groq)
     GROQ_API_KEY: str = ""
 
+    # Client API Key (for caller authentication)
+    API_KEY: str = "aegis-dev-key"
+
     # App
     APP_NAME: str = "AegisAI"
     DEBUG: bool = False

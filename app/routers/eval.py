@@ -7,10 +7,11 @@ from app.detection.similarity import find_similar_chunks
 from app.detection.judge import judge_factual_overlap
 from app.detection.policy import compute_risk_score, route_policy
 from app.config import settings
+from app.auth import verify_api_key
 
 router = APIRouter(tags=["eval"])
 
-@router.post("/v1/eval/run")
+@router.post("/v1/eval/run", dependencies=[Depends(verify_api_key)])
 async def run_evaluation(session: AsyncSession = Depends(get_session)):
     with open("tests/eval_cases.json") as f:
         cases = json.load(f)

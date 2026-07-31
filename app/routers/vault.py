@@ -10,11 +10,12 @@ from app.models import VaultDocument, VaultChunk
 from app.ingestion.extract import extract_text
 from app.ingestion.chunk import chunk_text
 from app.ingestion.embed import embed_batch
+from app.auth import verify_api_key
 
 router = APIRouter(tags=["vault"])
 
 
-@router.post("/v1/vault/documents")
+@router.post("/v1/vault/documents", dependencies=[Depends(verify_api_key)])
 async def upload_document(
     file: UploadFile,
     sensitivity_tag: str = "restricted",

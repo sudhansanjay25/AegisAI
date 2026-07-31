@@ -14,6 +14,7 @@ from app.detection.judge import judge_factual_overlap
 from app.detection.policy import compute_risk_score, route_policy
 from app.models import ScoredOutput
 from app.config import settings
+from app.auth import verify_api_key
 from prometheus_client import Counter, Histogram
 
 router = APIRouter(tags=["scoring"])
@@ -30,7 +31,7 @@ class ScoreRequest(BaseModel):
     session_id: str | None = None
 
 
-@router.post("/v1/outputs/score")
+@router.post("/v1/outputs/score", dependencies=[Depends(verify_api_key)])
 async def score_output(
     payload: ScoreRequest, 
     background_tasks: BackgroundTasks,
@@ -133,7 +134,7 @@ from sqlalchemy import select
 from datetime import date
 import httpx
 
-@router.get("/v1/outputs/{output_id}")
+@router.get("/v1/outputs/{output_id}", dependencies=[Depends(verify_api_key)])
 async def get_output(output_id: int, session: AsyncSession = Depends(get_session)):
     stmt = select(ScoredOutput).where(ScoredOutput.id == output_id)
     result = await session.execute(stmt)
@@ -142,7 +143,7 @@ async def get_output(output_id: int, session: AsyncSession = Depends(get_session
         raise HTTPException(status_code=404, detail="Scored output not found")
     return scored
 
-@router.get("/v1/alerts")
+@router.get("/v1/alerts", dependencies=[Depends(verify_api_key)])
 async def get_alerts(
     agent_id: str | None = None,
     start_date: date | None = None,
