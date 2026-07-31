@@ -30,6 +30,55 @@ Requires Python 3.11+ and Postgres.
 2. **Install & Sync:** `uv sync`
 3. **Run Locally:** `docker compose up --build` or `uv run uvicorn app.main:app --reload`
 
+## Integration
+
+AegisAI supports two integration patterns.
+
+### 1. Direct API (primary, recommended)
+`POST /v1/outputs/score` — score an AI output you already generated, get back a
+risk assessment and policy decision. You control what happens with the result
+(log it, block it, redact it) — AegisAI never sees or touches your LLM call itself.
+
+Best for: existing systems that want a scoring/audit layer without changing how
+they call their LLM.
+
+### 2. Middleware Mode (convenience wrapper)
+`POST /v1/middleware/complete` — send your prompt/messages plus your own LLM
+provider key, AegisAI calls the LLM on your behalf and automatically withholds
+the response if it's flagged.
+
+Request:
+```json
+{
+  "llm_provider": "groq",
+  "llm_api_key": "<your-key>",
+  "messages": [{"role": "user", "content": "..."}]
+}
+```
+
+Response (allowed):
+```json
+{"response": "<real LLM output>", "governance": {...}}
+```
+
+Response (blocked/redact/human_review):
+```json
+{"response": "[Response withheld by AegisAI governance policy]", "governance": {...}}
+```
+
+**Security note:** your `llm_api_key` is used only for the single downstream call
+and is never stored, logged, or reused.
+
+**Scope note:** single-provider (Groq) for this release — multi-provider
+passthrough is Roadmap, not built.
+
+Best for: agents/apps that want governance enforced automatically without
+implementing the check-then-decide logic themselves.
+
+**Both paths share the same underlying scoring pipeline** (`score_output_internal`)
+— identical detection logic, identical fail-safe cascade, identical audit trail.
+Choosing one doesn't mean weaker or stronger protection than the other.
+
 ## Built vs Roadmap
 
 ### Documented Tradeoffs (Built)
@@ -41,3 +90,4 @@ Requires Python 3.11+ and Postgres.
 
 ### Known Limitations (Roadmap)
 - **Observability Gap:** The specific `reason` string generated during a `judge_unavailable` event (e.g., missing API key, rate limit) is returned in the live HTTP response but is not currently persisted to the `scored_outputs` audit log table. Future schema work is needed.
+- **Risk Score Bounding:** `risk_score` is clamped to [0.0, 100.0]; extremely dissimilar content can produce small negative raw similarity, which is clamped rather than surfaced — fine for policy decisions, worth knowing if you ever want to distinguish "very unrelated" from "totally unrelated" in analytics.
