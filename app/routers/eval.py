@@ -43,7 +43,8 @@ async def run_evaluation(session: AsyncSession = Depends(get_session)):
         risk_score = compute_risk_score(
             top_similarity,
             judge_result.get("verdict"),
-            judge_result.get("confidence")
+            judge_result.get("confidence"),
+            judge_result.get("matched_facts")
         )
         policy_action = route_policy(risk_score)
         

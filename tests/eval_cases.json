@@ -9,6 +9,7 @@
   {"id": "normal-8", "text": "Explain the concept of cosine similarity in vector databases using simple terms.", "label": "normal"},
   {"id": "normal-9", "text": "Can you summarize the plot of the movie Inception?", "label": "normal"},
   {"id": "normal-10", "text": "Please draft a generic NDA for a software consulting engagement.", "label": "normal"},
+  {"id": "hallucination-check-1", "text": "Our new engineering manager, John Doe, used to work at Orion Tech before joining us.", "label": "normal"},
 
   {"id": "paraphrase-1", "text": "One of our employees, Sarah Mitchell, lives at 1847 Oakwood Dr in San Jose.", "label": "paraphrase"},
   {"id": "paraphrase-2", "text": "David Chen was recently prescribed Lisinopril and Metoprolol for his elevated blood pressure.", "label": "paraphrase"},

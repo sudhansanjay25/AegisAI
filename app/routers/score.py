@@ -73,7 +73,8 @@ async def score_output(
     risk_score = compute_risk_score(
         top_similarity, 
         judge_result.get("verdict"), 
-        judge_result.get("confidence")
+        judge_result.get("confidence"),
+        judge_result.get("matched_facts")
     )
     policy_action = route_policy(risk_score)
     POLICY_ACTIONS_TOTAL.labels(action=policy_action).inc()

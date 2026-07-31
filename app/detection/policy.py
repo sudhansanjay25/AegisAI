@@ -1,4 +1,7 @@
-def compute_risk_score(similarity_score: float, judge_verdict: str | None, judge_confidence: float | None) -> float:
+def compute_risk_score(similarity_score: float, judge_verdict: str | None, judge_confidence: float | None, matched_facts: list[str] | None = None) -> float:
+    if judge_verdict == "leak" and not matched_facts:
+        judge_verdict = "no_leak"
+        
     if judge_verdict == "leak":
         return min(100.0, 50.0 + float(judge_confidence or 0.0) * 50.0)
     if judge_verdict == "judge_unavailable":
