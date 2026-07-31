@@ -10,6 +10,7 @@ from groq import AsyncGroq
 from app.config import settings
 
 JUDGE_MODEL = "llama-3.3-70b-versatile"
+FALLBACK_MODEL = "llama-3.1-8b-instant"
 
 JUDGE_SYSTEM_PROMPT = """You are a data-leak detection judge. You will be given:
 1. OUTPUT — text produced by an LLM
@@ -53,18 +54,26 @@ async def judge_factual_overlap(output_text: str, matched_chunks: list[str]) -> 
     """
     client = _get_client()
     chunks_text = "\n---\n".join(matched_chunks)
+    
+    messages = [
+        {"role": "system", "content": JUDGE_SYSTEM_PROMPT},
+        {"role": "user", "content": f"OUTPUT:\n{output_text}\n\nVAULT_CHUNKS:\n{chunks_text}"},
+    ]
 
-    response = await client.chat.completions.create(
-        model=JUDGE_MODEL,
-        messages=[
-            {"role": "system", "content": JUDGE_SYSTEM_PROMPT},
-            {
-                "role": "user",
-                "content": f"OUTPUT:\n{output_text}\n\nVAULT_CHUNKS:\n{chunks_text}",
-            },
-        ],
-        response_format={"type": "json_object"},
-        temperature=0,
-    )
+    try:
+        response = await client.chat.completions.create(
+            model=JUDGE_MODEL,
+            messages=messages,
+            response_format={"type": "json_object"},
+            temperature=0,
+        )
+    except Exception as primary_err:
+        print(f"[JUDGE FALLBACK] Primary model ({JUDGE_MODEL}) failed: {primary_err}. Trying fallback...")
+        response = await client.chat.completions.create(
+            model=FALLBACK_MODEL,
+            messages=messages,
+            response_format={"type": "json_object"},
+            temperature=0,
+        )
 
     return json.loads(response.choices[0].message.content)
